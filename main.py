@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 실시간 뉴스 속보를 참고하여 주식 매수/매도로 1억 원을 달성하세요.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 주식 매수/매도 시 자산이 즉시 실시간 반영됩니다.")
 
 game_html = """
 <!DOCTYPE html>
@@ -585,6 +585,8 @@ function buyStock(stockId, qty) {
     s.owned += qty;
     s.totalCost += totalCost;
     addFloatingText(-totalCost);
+    
+    // 매수 즉시 UI 및 자산 즉각 반영
     updateUI();
     renderStockMarketUI();
 }
@@ -597,13 +599,15 @@ function sellStock(stockId, qty) {
     let sellQty = (qty === 5) ? s.owned : Math.min(qty, s.owned);
     let revenue = s.price * sellQty;
     
-    let avgCost = s.totalCost / s.owned;
+    let avgCost = s.owned > 0 ? (s.totalCost / s.owned) : 0;
     s.owned -= sellQty;
     s.totalCost -= (avgCost * sellQty);
     if (s.owned <= 0) s.totalCost = 0;
 
     cash += revenue;
     addFloatingText(revenue);
+    
+    // 매도 즉시 UI 및 자산 즉각 반영
     updateUI();
     renderStockMarketUI();
 }
