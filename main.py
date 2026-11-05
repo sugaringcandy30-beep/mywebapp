@@ -1,3 +1,8 @@
+`processTurn()` 함수에서 턴이 초과되었을 때 하단에 버튼을 뿌려주는 `checkProximity()` 함수가 정상적으로 다시 그려지지 않아 버튼이 화면에 나타나지 않았던 문제입니다!
+
+승리(`YOU WIN`)나 패배(`YOU LOSE`) 화면으로 전환될 때 **[🔄 다시하기 (RESTART)]** 버튼이 하단에 즉시 생성되고 마우스 클릭 없이도 완전히 게임 조작이 차단되도록 수정한 전체 코드입니다. `main.py`에 전체 복사해서 붙여넣으시면 12턴이 끝나는 순간 하단에 주황색 다시하기 버튼이 깔끔하게 표시됩니다.
+
+```python:main.py
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -159,7 +164,7 @@ game_html = """
         background: linear-gradient(135deg, #f59e0b, #d97706);
         color: white;
         border: none;
-        padding: 14px 32px;
+        padding: 14px 36px;
         border-radius: 12px;
         cursor: pointer;
         font-family: 'Pretendard', sans-serif;
@@ -305,7 +310,7 @@ let currentScene = 'town';
 let ownedBuildings = [];
 const goalMoney = 100000000;
 let isGameOver = false;
-let gameResult = ''; // 'win' or 'lose'
+let gameResult = ''; 
 
 let miniGameCount = 0;
 let floatingTexts = [];
@@ -397,6 +402,7 @@ function restartGame() {
     document.getElementById('locationText').innerText = '메인 스트리트';
     lastProximityKey = null;
     updateUI();
+    checkProximity();
     canvas.focus();
 }
 
@@ -449,17 +455,26 @@ function exitBuilding() {
     checkProximity();
 }
 
+function triggerGameOver(result) {
+    isGameOver = true;
+    gameResult = result;
+    const actionArea = document.getElementById('actionArea');
+    const dialogue = document.getElementById('dialogue');
+    
+    if (gameResult === 'win') {
+        dialogue.innerHTML = "🎉 <b>축하합니다! 1억 원을 달성하여 강남 건물주가 되었습니다!</b>";
+    } else {
+        dialogue.innerHTML = "❌ <b>12턴이 종료되었거나 파산했습니다.</b> 아래 버튼으로 다시 도전해 보세요!";
+    }
+    actionArea.innerHTML = `<button class="restart-btn" onclick="restartGame()">🔄 다시하기 (RESTART)</button>`;
+}
+
 function checkProximity() {
     const actionArea = document.getElementById('actionArea');
     const dialogue = document.getElementById('dialogue');
 
     if (isGameOver) {
-        if (gameResult === 'win') {
-            dialogue.innerHTML = "🎉 <b>축하합니다! 1억 원을 달성하여 강남 건물주가 되었습니다!</b>";
-        } else {
-            dialogue.innerHTML = "❌ <b>게임이 종료되었습니다.</b> 아래 다시하기 버튼을 눌러 다시 도전하세요.";
-        }
-        actionArea.innerHTML = `<button class="restart-btn" onclick="restartGame()">🔄 다시하기 (RESTART)</button>`;
+        triggerGameOver(gameResult);
         return;
     }
 
@@ -612,23 +627,17 @@ function processTurn() {
         addFloatingText(rentSum);
     }
     
-    // 자산 체크 (목표 달성 시 즉시 승리)
     if (money >= goalMoney) {
-        isGameOver = true;
-        gameResult = 'win';
         updateUI();
-        checkProximity();
+        triggerGameOver('win');
         return;
     }
 
     turn += 1;
     
-    // 12턴 도달 시점에 즉시 게임 종료 판정 (12턴 안에서 마지막 행동 반영 후 종료)
     if (turn > 12) {
-        isGameOver = true;
-        gameResult = money >= goalMoney ? 'win' : 'lose';
         updateUI();
-        checkProximity();
+        triggerGameOver(money >= goalMoney ? 'win' : 'lose');
         return;
     }
     
@@ -643,10 +652,8 @@ function processTurn() {
     lastProximityKey = null;
 
     if (money <= 0) {
-        isGameOver = true;
-        gameResult = 'lose';
         updateUI();
-        checkProximity();
+        triggerGameOver('lose');
     }
 }
 
@@ -667,12 +674,9 @@ function buyBuilding(name, price, rent) {
     ownedBuildings.push({ name, rent });
     canvas.focus();
     
-    // 강남타워(1억)를 직접 구매해서 목표 달성한 경우 즉시 승리 처리
     if (money >= goalMoney) {
-        isGameOver = true;
-        gameResult = 'win';
         updateUI();
-        checkProximity();
+        triggerGameOver('win');
         return;
     }
     updateUI();
@@ -747,7 +751,6 @@ function draw() {
 
     ctx.restore();
 
-    // 게임 오버 시 승패에 따른 화면 오버레이 렌더링
     if (isGameOver) {
         ctx.save();
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
@@ -870,7 +873,6 @@ function drawVectorPlayer(x, y, facing) {
     let bounce = Math.sin(player.animFrame) * 2;
     if (!player.isGrounded) bounce = -6;
 
-    // 패배 시(YOU LOSE) 초라하고 거지같이 변한 캐릭터 모습
     if (isGameOver && gameResult === 'lose') {
         ctx.fillStyle = '#475569';
         ctx.beginPath();
@@ -1010,3 +1012,5 @@ requestAnimationFrame(update);
 """
 
 components.html(game_html, height=920)
+
+```
