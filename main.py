@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 매수·매도 종료 버튼으로 하룻밤을 보내며 1억 원을 달성하세요.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 매수·매도 종료 시 메인 스트리트로 귀환하며 하룻밤이 지나갑니다.")
 
 game_html = """
 <!DOCTYPE html>
@@ -587,7 +587,7 @@ function renderStockMarketUI() {
 
     html += `</div>
         <div style="margin-top: 6px;">
-            <button class="enter-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 7px 16px; font-size: 13px;" onclick="passTurnByStock()">🌙 매수·매도 종료하기 (하룻밤 지나기)</button>
+            <button class="enter-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 7px 16px; font-size: 13px;" onclick="passTurnByStock()">🌙 매수·매도 종료하고 메인으로 귀환 (하룻밤 지나기)</button>
             <button class="exit-btn" onclick="exitBuilding()">🚪 나가기</button>
         </div>
     `;
@@ -669,6 +669,7 @@ function updateStockPrices() {
 function processTurn() {
     if (isGameOver) return;
 
+    // 하룻밤 지나며 낮/밤 전환 연출
     isDay = !isDay;
     document.getElementById('dayNightText').innerText = isDay ? "아침 🌅" : "밤 🌙";
     document.getElementById('dayNightText').style.color = isDay ? "#fbbf24" : "#a855f7";
@@ -712,11 +713,14 @@ function processTurn() {
     updateUI();
     lastProximityKey = null;
 
-    if (currentScene === 'stock') {
-        renderStockMarketUI();
-    } else {
-        checkProximity();
-    }
+    // 매매 종료 시 증권타워 내부에서 메인 스트리트(처음 화면)로 자동 복귀
+    let bObj = buildings.find(b => b.id === 'stock');
+    currentScene = 'town';
+    player.x = bObj.portalX;
+    player.y = 320;
+    document.getElementById('locationText').innerText = '메인 스트리트';
+
+    checkProximity();
 
     if (currentTotalAssets <= 0) {
         updateUI();
