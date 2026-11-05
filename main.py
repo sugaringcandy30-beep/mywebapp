@@ -305,6 +305,7 @@ let currentScene = 'town';
 let ownedBuildings = [];
 const goalMoney = 100000000;
 let isGameOver = false;
+let gameResult = ''; // 'win' or 'lose'
 
 let miniGameCount = 0;
 let floatingTexts = [];
@@ -387,6 +388,7 @@ function restartGame() {
     ownedBuildings = [];
     miniGameCount = 0;
     isGameOver = false;
+    gameResult = '';
     floatingTexts = [];
     player.x = 120;
     player.y = 320;
@@ -452,7 +454,11 @@ function checkProximity() {
     const dialogue = document.getElementById('dialogue');
 
     if (isGameOver) {
-        dialogue.innerHTML = "❌ <b>게임이 종료되었습니다.</b> 아래 다시하기 버튼을 눌러주세요.";
+        if (gameResult === 'win') {
+            dialogue.innerHTML = "🎉 <b>축하합니다! 1억 원을 달성하여 강남 건물주가 되었습니다!</b>";
+        } else {
+            dialogue.innerHTML = "❌ <b>게임이 종료되었습니다.</b> 아래 다시하기 버튼을 눌러 다시 도전하세요.";
+        }
         actionArea.innerHTML = `<button class="restart-btn" onclick="restartGame()">🔄 다시하기 (RESTART)</button>`;
         return;
     }
@@ -605,7 +611,26 @@ function processTurn() {
         money += rentSum;
         addFloatingText(rentSum);
     }
+    
+    // 자산 체크 (목표 달성 시 즉시 승리)
+    if (money >= goalMoney) {
+        isGameOver = true;
+        gameResult = 'win';
+        updateUI();
+        checkProximity();
+        return;
+    }
+
     turn += 1;
+    
+    // 12턴 도달 시점에 즉시 게임 종료 판정 (12턴 안에서 마지막 행동 반영 후 종료)
+    if (turn > 12) {
+        isGameOver = true;
+        gameResult = money >= goalMoney ? 'win' : 'lose';
+        updateUI();
+        checkProximity();
+        return;
+    }
     
     if (Math.random() < 0.75) {
         currentNews = newsEvents[Math.floor(Math.random() * newsEvents.length)];
@@ -617,16 +642,10 @@ function processTurn() {
     updateUI();
     lastProximityKey = null;
 
-    if (money >= goalMoney) {
+    if (money <= 0) {
         isGameOver = true;
-        alert("🎉 1억 원 달성! 강남 건물주가 되었습니다!");
-        checkProximity();
-    } else if (turn > 12) {
-        isGameOver = true;
-        checkProximity();
-    } else if (money <= 0) {
-        isGameOver = true;
-        alert("💥 파산했습니다!");
+        gameResult = 'lose';
+        updateUI();
         checkProximity();
     }
 }
@@ -647,6 +666,15 @@ function buyBuilding(name, price, rent) {
     addFloatingText(-price);
     ownedBuildings.push({ name, rent });
     canvas.focus();
+    
+    // 강남타워(1억)를 직접 구매해서 목표 달성한 경우 즉시 승리 처리
+    if (money >= goalMoney) {
+        isGameOver = true;
+        gameResult = 'win';
+        updateUI();
+        checkProximity();
+        return;
+    }
     updateUI();
 }
 
@@ -719,22 +747,33 @@ function draw() {
 
     ctx.restore();
 
-    // 게임 오버 시 화면 어둡게 처리 및 YOU LOSE 문구 렌더링
-    if (isGameOver && (turn > 12 || money <= 0) && money < goalMoney) {
+    // 게임 오버 시 승패에 따른 화면 오버레이 렌더링
+    if (isGameOver) {
         ctx.save();
         ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = '#f43f5e';
-        ctx.font = '700 48px Pretendard, sans-serif';
         ctx.textAlign = 'center';
         ctx.shadowColor = '#000';
         ctx.shadowBlur = 20;
-        ctx.fillText('YOU LOSE', canvas.width / 2, canvas.height / 2 - 20);
 
-        ctx.fillStyle = '#cbd5e1';
-        ctx.font = '600 18px Pretendard, sans-serif';
-        ctx.fillText('게임 종료! 최종 자산: ' + money.toLocaleString() + '원', canvas.width / 2, canvas.height / 2 + 30);
+        if (gameResult === 'win') {
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = '700 48px Pretendard, sans-serif';
+            ctx.fillText('YOU WIN!', canvas.width / 2, canvas.height / 2 - 20);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '600 18px Pretendard, sans-serif';
+            ctx.fillText('축하합니다! 1억 원을 달성하여 강남 건물주가 되었습니다!', canvas.width / 2, canvas.height / 2 + 30);
+        } else {
+            ctx.fillStyle = '#f43f5e';
+            ctx.font = '700 48px Pretendard, sans-serif';
+            ctx.fillText('YOU LOSE', canvas.width / 2, canvas.height / 2 - 20);
+
+            ctx.fillStyle = '#cbd5e1';
+            ctx.font = '600 18px Pretendard, sans-serif';
+            ctx.fillText('12턴 종료! 목표 금액 미달성 최종 자산: ' + money.toLocaleString() + '원', canvas.width / 2, canvas.height / 2 + 30);
+        }
         ctx.restore();
     }
 }
@@ -831,8 +870,8 @@ function drawVectorPlayer(x, y, facing) {
     let bounce = Math.sin(player.animFrame) * 2;
     if (!player.isGrounded) bounce = -6;
 
-    // 게임 오버 시 초라하고 거지같이 변한 캐릭터 모습
-    if (isGameOver && (turn > 12 || money <= 0) && money < goalMoney) {
+    // 패배 시(YOU LOSE) 초라하고 거지같이 변한 캐릭터 모습
+    if (isGameOver && gameResult === 'lose') {
         ctx.fillStyle = '#475569';
         ctx.beginPath();
         ctx.roundRect(x - 16, y - 38 + bounce, 32, 44, [6]);
