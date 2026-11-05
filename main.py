@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 코인은 기존 타이밍 미니게임으로 원복되었고, 증권타워 주식 매매와 자산 반영이 정상 작동합니다.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 코인 미니게임의 급등락 변동성이 극대화되었습니다.")
 
 game_html = """
 <!DOCTYPE html>
@@ -357,7 +357,7 @@ let portalAnim = 0;
 let keys = {};
 let lastProximityKey = null;
 
-// 코인 타이밍 미니게임 관련 상태 변수
+// 코인 0.1초 단위 초고속 급등락 미니게임 상태 변수
 let isCryptoGameActive = false;
 let cryptoMultiplier = 1.0;
 let cryptoGameInterval = null;
@@ -551,10 +551,9 @@ function renderDialogueOptions(type) {
     } else if (type === 'stock') {
         renderStockMarketUI();
     } else if (type === 'crypto') {
-        // 원래의 코인 타이밍 미니게임 방식 유지
         if (!isCryptoGameActive) {
             actionArea.innerHTML = `
-                <button class="action-btn" style="background: linear-gradient(135deg, #f43f5e, #e11d48); padding: 8px 20px; font-size: 14px;" onclick="startCryptoMinigame()">🚀 코인 타이밍 미니게임 시작 (스페이스바로 수익 캐치!)</button>
+                <button class="action-btn" style="background: linear-gradient(135deg, #f43f5e, #e11d48); padding: 8px 20px; font-size: 14px;" onclick="startCryptoMinigame()">🚀 초고속 급등락 코인 미니게임 시작 (스페이스바로 매도!)</button>
                 <div style="margin-top: 6px;"><button class="exit-btn" onclick="exitBuilding()">🚪 나가기</button></div>
             `;
         }
@@ -568,53 +567,54 @@ function renderDialogueOptions(type) {
     }
 }
 
-// 코인 타이밍 미니게임 시작 함수
+// 0.1초 단위 초고속 급등락 코인 타이밍 미니게임 시작 함수
 function startCryptoMinigame() {
     if (isGameOver) return;
     isCryptoGameActive = true;
-    cryptoMultiplier = 0.5;
+    cryptoMultiplier = 1.0;
     
     const dialogue = document.getElementById('dialogue');
     const actionArea = document.getElementById('actionArea');
     
-    dialogue.innerHTML = "🚀 <b>사이버 코인 급등락 타이밍 미니게임 진행 중!</b> 배율이 올라갑니다. 적절한 순간에 <b>[스페이스바]</b>를 누르거나 아래 버튼을 누르세요!";
+    dialogue.innerHTML = "🚀 <b>초고속 급등락 코인 미니게임 진행 중!</b> 0.1초마다 폭등과 폭락을 오갑니다. 적절한 순간에 <b>[스페이스바]</b>를 누르거나 아래 버튼을 누르세요!";
     actionArea.innerHTML = `
-        <div style="font-size: 18px; font-weight: 700; color: #f43f5e; margin-bottom: 6px;">현재 배율: <span id="multiplierDisplay">1.0</span>x</div>
-        <button class="action-btn" style="background: linear-gradient(135deg, #f43f5e, #e11d48); padding: 10px 24px; font-size: 15px;" onclick="stopCryptoMinigame()">🛑 지금 매도 (수익 확정 & 턴 진행)</button>
+        <div style="font-size: 18px; font-weight: 700; color: #f43f5e; margin-bottom: 6px;">현재 배율: <span id="multiplierDisplay">1.00</span>x</div>
+        <button class="action-btn" style="background: linear-gradient(135deg, #f43f5e, #e11d48); padding: 10px 24px; font-size: 15px;" onclick="stopCryptoMinigame()">🛑 지금 매도 (수익/손실 확정 & 턴 진행)</button>
     `;
 
     if (cryptoGameInterval) clearInterval(cryptoGameInterval);
+    // 0.1초(100ms) 단위로 급등락 진동 폭 대폭 확대
     cryptoGameInterval = setInterval(() => {
-        cryptoMultiplier += (Math.random() * 0.25 + 0.05);
-        let span = document.getElementById('multiplierDisplay');
-        if (span) span.innerText = cryptoMultiplier.toFixed(2);
+        let delta = (Math.random() * 0.8 - 0.38); // -38% ~ +42% 순간 변동
+        cryptoMultiplier = Math.max(0.1, cryptoMultiplier + delta);
         
-        // 너무 오래 놔두면 폭락해서 꽝이 되는 확률 부여
-        if (cryptoMultiplier > 4.5 && Math.randon < 0.15) {
-            stopCryptoMinigame(true); // 폭락 꽝
+        let span = document.getElementById('multiplierDisplay');
+        if (span) {
+            span.innerText = cryptoMultiplier.toFixed(2);
+            span.style.color = cryptoMultiplier >= 1.0 ? '#10b981' : '#f43f5e';
         }
-    }, 120);
+    }, 100);
 }
 
 // 코인 타이밍 미니게임 종료 및 정산 함수
-function stopCryptoMinigame(isCrash = false) {
+function stopCryptoMinigame() {
     if (!isCryptoGameActive) return;
     isCryptoGameActive = false;
     if (cryptoGameInterval) clearInterval(cryptoGameInterval);
 
-    let finalRate = isCrash ? -0.8 : (cryptoMultiplier - 1.0);
+    let finalRate = cryptoMultiplier - 1.0;
     let gainLoss = Math.floor(cash * finalRate);
     cash += gainLoss;
-    if (cash < 10000) cash = 10000; // 최소 생존금
+    if (cash < 10000) cash = 10000; // 파산 방지 최소 잔고
 
     addFloatingText(gainLoss);
     updateUI();
 
     const dialogue = document.getElementById('dialogue');
-    if (isCrash) {
-        dialogue.innerHTML = `💥 <b>코인 폭락!</b> 타이밍을 놓쳐서 자산의 대폭 손실을 입었습니다! (${gainLoss.toLocaleString()}원)`;
+    if (finalRate < 0) {
+        dialogue.innerHTML = `💥 <b>코인 폭락 타이밍 캐치!</b> 손실을 입었습니다! (${gainLoss.toLocaleString()}원, 최종 배율: ${cryptoMultiplier.toFixed(2)}x)`;
     } else {
-        dialogue.innerHTML = `🎉 <b>코인 매도 성공!</b> 배율 <b>${cryptoMultiplier.toFixed(2)}x</b>로 정산되어 하룻밤이 지나갑니다!`;
+        dialogue.innerHTML = `🎉 <b>코인 급등 타이밍 캐치 성공!</b> 배율 <b>${cryptoMultiplier.toFixed(2)}x</b>로 정산되어 하룻밤이 지나갑니다!`;
     }
 
     setTimeout(() => {
