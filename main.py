@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 주식 매수·매도 및 자산 관리를 완벽하게 즐기세요.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 증권타워 주식 매매와 자산 반영 오류가 수정되었습니다.")
 
 game_html = """
 <!DOCTYPE html>
@@ -514,7 +514,7 @@ function checkProximity() {
                 dialogue.innerHTML = "🚪 메인 스트리트로 나가는 출구입니다.";
                 actionArea.innerHTML = `<button class="exit-btn" onclick="exitBuilding()">🚪 밖으로 나가기</button>`;
             } else if (zone === 'npc') {
-                dialogue.innerHTML = `💬 <b>${npc.name}</b>: "어서오세요! 주식 매매를 완료하셨다면 아래 버튼을 눌러 하룻밤을 보내세요."`;
+                dialogue.innerHTML = `💬 <b>${npc.name}</b>: "어서오세요! 원하는 투자 항목을 선택해 주세요."`;
                 renderDialogueOptions(currentScene);
             } else {
                 dialogue.innerHTML = `🏢 컨설팅 데스크로 가까이 다가가세요.`;
