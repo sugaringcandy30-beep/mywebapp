@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 매수·매도 종료 시 메인 스트리트로 귀환하며 하룻밤이 지나갑니다.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 주식 매수·매도 및 자산 관리를 완벽하게 즐기세요.")
 
 game_html = """
 <!DOCTYPE html>
@@ -606,8 +606,8 @@ function executeBuy(stockId) {
     if (cash < totalCost) { alert("현금이 부족합니다!"); return; }
     
     cash -= totalCost;
-    s.owned += qty;
     s.totalCost += totalCost;
+    s.owned += qty;
     addFloatingText(-totalCost);
     
     updateUI();
@@ -622,8 +622,8 @@ function executeMaxBuy(stockId) {
 
     let totalCost = s.price * maxQty;
     cash -= totalCost;
-    s.owned += maxQty;
     s.totalCost += totalCost;
+    s.owned += maxQty;
     addFloatingText(-totalCost);
 
     updateUI();
@@ -638,14 +638,19 @@ function executeSell(stockId) {
     if (s.owned <= 0) { alert("보유한 주식이 없습니다!"); return; }
 
     let sellQty = Math.min(qty, s.owned);
-    let revenue = s.price * sellQty;
-    
     let avgCost = s.owned > 0 ? (s.totalCost / s.owned) : 0;
-    s.owned -= sellQty;
-    s.totalCost -= (avgCost * sellQty);
-    if (s.owned <= 0) s.totalCost = 0;
-
+    
+    let revenue = s.price * sellQty;
     cash += revenue;
+
+    s.owned -= sellQty;
+    if (s.owned <= 0) {
+        s.totalCost = 0;
+        s.owned = 0;
+    } else {
+        s.totalCost -= (avgCost * sellQty);
+    }
+
     addFloatingText(revenue);
     
     updateUI();
@@ -669,7 +674,6 @@ function updateStockPrices() {
 function processTurn() {
     if (isGameOver) return;
 
-    // 하룻밤 지나며 낮/밤 전환 연출
     isDay = !isDay;
     document.getElementById('dayNightText').innerText = isDay ? "아침 🌅" : "밤 🌙";
     document.getElementById('dayNightText').style.color = isDay ? "#fbbf24" : "#a855f7";
@@ -713,7 +717,6 @@ function processTurn() {
     updateUI();
     lastProximityKey = null;
 
-    // 매매 종료 시 증권타워 내부에서 메인 스트리트(처음 화면)로 자동 복귀
     let bObj = buildings.find(b => b.id === 'stock');
     currentScene = 'town';
     player.x = bObj.portalX;
