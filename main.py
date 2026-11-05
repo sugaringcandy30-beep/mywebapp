@@ -459,7 +459,7 @@ function triggerGameOver(result) {
     if (gameResult === 'win') {
         dialogue.innerHTML = "🎉 <b>축하합니다! 1억 원을 달성하여 강남 건물주가 되었습니다!</b>";
     } else {
-        dialogue.innerHTML = "❌ <b>12턴이 종료되었거나 파산했습니다.</b> 아래 버튼으로 다시 도전해 보세요!";
+        dialogue.innerHTML = "❌ <b>12턴이 모두 종료되었습니다. 목표 금액 미달성으로 패배했습니다!</b>";
     }
     actionArea.innerHTML = `<button class="restart-btn" onclick="restartGame()">🔄 다시하기 (RESTART)</button>`;
 }
@@ -622,17 +622,21 @@ function processTurn() {
         addFloatingText(rentSum);
     }
     
+    // 1억 원 목표 달성 체크 (즉시 승리)
     if (money >= goalMoney) {
         updateUI();
         triggerGameOver('win');
         return;
     }
 
+    // 턴 증가
     turn += 1;
     
+    // 12턴이 초과되는 즉시 패배 처리 (12턴 종료 시점 감지)
     if (turn > 12) {
+        turn = 12; // UI 표시를 12/12로 고정
         updateUI();
-        triggerGameOver(money >= goalMoney ? 'win' : 'lose');
+        triggerGameOver('lose');
         return;
     }
     
@@ -680,18 +684,6 @@ function buyBuilding(name, price, rent) {
 function updateUI() {
     document.getElementById('moneyText').innerText = money.toLocaleString();
     document.getElementById('turnText').innerText = turn > 12 ? 12 : turn;
-
-    const skinText = document.getElementById('skinText');
-    if (money >= 50000000) {
-        skinText.innerText = "👑 골드 건물주";
-        skinText.style.color = "#fbbf24";
-    } else if (money >= 20000000) {
-        skinText.innerText = "💼 명품 트레이더";
-        skinText.style.color = "#a855f7";
-    } else {
-        skinText.innerText = "👔 초보 개미";
-        skinText.style.color = "#38bdf8";
-    }
 
     let percent = Math.min(100, Math.max(1, Math.floor((money / goalMoney) * 100)));
     document.getElementById('progressBar').style.width = percent + '%';
@@ -748,7 +740,7 @@ function draw() {
 
     if (isGameOver) {
         ctx.save();
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.textAlign = 'center';
