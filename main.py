@@ -452,7 +452,7 @@ function checkProximity() {
     const dialogue = document.getElementById('dialogue');
 
     if (isGameOver) {
-        dialogue.innerHTML = "❌ <b>게임 종료되었습니다.</b> 아래 다시하기 버튼을 눌러주세요.";
+        dialogue.innerHTML = "❌ <b>게임이 종료되었습니다.</b> 아래 다시하기 버튼을 눌러주세요.";
         actionArea.innerHTML = `<button class="restart-btn" onclick="restartGame()">🔄 다시하기 (RESTART)</button>`;
         return;
     }
@@ -555,7 +555,7 @@ function updateMeter() {
 }
 
 function stopMeter() {
-    if (!meterActive) return;
+    if (!meterActive || isGameOver) return;
     meterActive = false;
     cancelAnimationFrame(meterAnimId);
     document.getElementById('minigameBox').style.display = 'none';
@@ -597,6 +597,8 @@ function stopMeter() {
 }
 
 function processTurn() {
+    if (isGameOver) return;
+
     let rentSum = 0;
     ownedBuildings.forEach(b => rentSum += b.rent);
     if (rentSum > 0) {
@@ -717,10 +719,10 @@ function draw() {
 
     ctx.restore();
 
-    // 12턴 종료 및 게임 오버 시 어두운 오버레이와 YOU LOSE 문구 렌더링
-    if (isGameOver && turn > 12 && money < goalMoney) {
+    // 게임 오버 시 화면 어둡게 처리 및 YOU LOSE 문구 렌더링
+    if (isGameOver && (turn > 12 || money <= 0) && money < goalMoney) {
         ctx.save();
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.fillStyle = '#f43f5e';
@@ -732,7 +734,7 @@ function draw() {
 
         ctx.fillStyle = '#cbd5e1';
         ctx.font = '600 18px Pretendard, sans-serif';
-        ctx.fillText('12턴이 종료되었습니다. 최종 자산: ' + money.toLocaleString() + '원', canvas.width / 2, canvas.height / 2 + 30);
+        ctx.fillText('게임 종료! 최종 자산: ' + money.toLocaleString() + '원', canvas.width / 2, canvas.height / 2 + 30);
         ctx.restore();
     }
 }
@@ -829,19 +831,19 @@ function drawVectorPlayer(x, y, facing) {
     let bounce = Math.sin(player.animFrame) * 2;
     if (!player.isGrounded) bounce = -6;
 
-    // 게임 오버(거지같이 변한 모습): 누더기 옷 색상 및 축 늘어진 형태
-    if (isGameOver && turn > 12 && money < goalMoney) {
-        ctx.fillStyle = '#475569'; // 누더기 옷
+    // 게임 오버 시 초라하고 거지같이 변한 캐릭터 모습
+    if (isGameOver && (turn > 12 || money <= 0) && money < goalMoney) {
+        ctx.fillStyle = '#475569';
         ctx.beginPath();
         ctx.roundRect(x - 16, y - 38 + bounce, 32, 44, [6]);
         ctx.fill();
 
-        ctx.fillStyle = '#94a3b8'; // 헝클어진 얼굴
+        ctx.fillStyle = '#94a3b8';
         ctx.beginPath();
         ctx.roundRect(x - 10, y - 28 + bounce, 20, 14, [4]);
         ctx.fill();
 
-        ctx.fillStyle = '#ef4444'; // 슬픈 눈물 포인트
+        ctx.fillStyle = '#ef4444';
         ctx.fillRect(x - 4, y - 24 + bounce, 2, 6);
         ctx.fillRect(x + 2, y - 24 + bounce, 2, 6);
 
