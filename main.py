@@ -1,8 +1,3 @@
-`processTurn()` 함수에서 턴이 초과되었을 때 하단에 버튼을 뿌려주는 `checkProximity()` 함수가 정상적으로 다시 그려지지 않아 버튼이 화면에 나타나지 않았던 문제입니다!
-
-승리(`YOU WIN`)나 패배(`YOU LOSE`) 화면으로 전환될 때 **[🔄 다시하기 (RESTART)]** 버튼이 하단에 즉시 생성되고 마우스 클릭 없이도 완전히 게임 조작이 차단되도록 수정한 전체 코드입니다. `main.py`에 전체 복사해서 붙여넣으시면 12턴이 끝나는 순간 하단에 주황색 다시하기 버튼이 깔끔하게 표시됩니다.
-
-```python:main.py
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -1012,5 +1007,3 @@ requestAnimationFrame(update);
 """
 
 components.html(game_html, height=920)
-
-```
