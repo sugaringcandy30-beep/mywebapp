@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 주식 매수/매도 시 자산이 즉시 실시간 반영됩니다.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 주식 매수/매도 시 잔고와 매수가능 수량이 즉시 실시간 반영됩니다.")
 
 game_html = """
 <!DOCTYPE html>
@@ -255,7 +255,7 @@ game_html = """
         <span>📍 위치: <span id="locationText" style="color: #38bdf8;">메인 스트리트</span></span>
         <span>☀️ 시간대: <span id="dayNightText" style="color: #fbbf24;">아침 🌅</span></span>
         <span>📅 턴: <span id="turnText">1</span>/12</span>
-        <span>💰 총 자산: <span id="moneyText" style="color: #10b981;">1,000,000</span>원</span>
+        <span>💰 총 자산: <span id="moneyText" style="color: #10b981;">1,000,000</span>원 (현금: <span id="cashText" style="color: #38bdf8;">1,000,000</span>원)</span>
     </div>
 
     <div id="progressContainer">
@@ -539,17 +539,20 @@ function renderStockMarketUI() {
         let sign = diff >= 0 ? '+' : '';
         let avgCost = s.owned > 0 ? Math.floor(s.totalCost / s.owned) : 0;
         let returnRate = s.owned > 0 ? (((s.price - avgCost) / avgCost) * 100).toFixed(1) : '0.0';
+        let maxBuyable = Math.floor(cash / s.price);
 
         html += `
             <div class="stock-card">
                 <div style="text-align:left;">
                     <span style="font-weight:700; color:#ffffff; font-size:12px;">${s.name}</span>
                     <span style="font-size:11px; color:${color}; margin-left:4px;">${s.price.toLocaleString()}원 (${sign}${rate}%)</span>
-                    <div style="font-size:10px; color:#cbd5e1; margin-top:1px;">보유: ${s.owned}주 | 평단: ${avgCost.toLocaleString()}원 | 수익률: <span style="color:${returnRate >= 0 ? '#10b981':'#f43f5e'}">${returnRate}%</span></div>
+                    <div style="font-size:10px; color:#cbd5e1; margin-top:1px;">보유: ${s.owned}주 | 평단: ${avgCost.toLocaleString()}원 | 수익률: <span style="color:${returnRate >= 0 ? '#10b981':'#f43f5e'}">${returnRate}%</span> | <span style="color:#38bdf8;">매수가능: ${maxBuyable}주</span></div>
                 </div>
                 <div>
-                    <button class="action-btn" style="font-size:11px; padding:4px 8px;" onclick="buyStock('${s.id}', 1)">매수</button>
-                    <button class="sell-btn" style="font-size:11px; padding:4px 8px;" onclick="sellStock('${s.id}', 5)">매도</button>
+                    <button class="action-btn" style="font-size:11px; padding:4px 8px;" onclick="buyStock('${s.id}', 1)">1주매수</button>
+                    <button class="action-btn" style="font-size:11px; padding:4px 8px;" onclick="buyStock('${s.id}', 5)">5주매수</button>
+                    <button class="sell-btn" style="font-size:11px; padding:4px 8px;" onclick="sellStock('${s.id}', 1)">1주매도</button>
+                    <button class="sell-btn" style="font-size:11px; padding:4px 8px;" onclick="sellStock('${s.id}', 5)">전량매도</button>
                 </div>
             </div>
         `;
@@ -722,11 +725,12 @@ function buyBuilding(name, price, rent) {
 function updateUI() {
     let totalAssets = getTotalAssets();
     document.getElementById('moneyText').innerText = totalAssets.toLocaleString();
+    document.getElementById('cashText').innerText = cash.toLocaleString();
     document.getElementById('turnText').innerText = turn > 12 ? 12 : turn;
 
     let percent = Math.min(100, Math.max(1, Math.floor((totalAssets / goalMoney) * 100)));
     document.getElementById('progressBar').style.width = percent + '%';
-    document.getElementById('progressText').innerText = `1억 원 목표 달성도: ${percent}% (${totalAssets.toLocaleString()}원 / 100,000,000원)`;
+    document.getElementById('progressText').innerText = `1억 원 목표 달성도: ${percent}% (총자산 ${totalAssets.toLocaleString()}원 / 100,000,000원)`;
 }
 
 function update() {
