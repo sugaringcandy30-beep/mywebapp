@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 증권타워에 명확한 '보유 주식 현황판' 칸이 추가되었습니다.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 부동산(오피스텔 등)의 가격과 월세 밸런스가 매력적으로 상향 조정되었습니다.")
 
 game_html = """
 <!DOCTYPE html>
@@ -255,7 +255,7 @@ game_html = """
 
 <div id="newsTickerBox">
     <span id="newsTag">실시간 속보</span>
-    <span id="newsText">모던 벡터 시티 금융 시장이 개장했습니다. 초기자금 500만 원으로 투자를 시작하세요!</span>
+    <span id="newsText">모던 벡터 시티 금융 시장이 개장했습니다. 초기자금 1,000만 원으로 투자를 시작하세요!</span>
 </div>
 
 <div id="gameContainer">
@@ -267,12 +267,12 @@ game_html = """
         <span>📍 위치: <span id="locationText" style="color: #38bdf8;">메인 스트리트</span></span>
         <span>☀️ 시간대: <span id="dayNightText" style="color: #fbbf24;">아침 🌅</span></span>
         <span>📅 턴: <span id="turnText">1</span>/12</span>
-        <span>💰 총 자산: <span id="moneyText" style="color: #10b981;">5,000,000</span>원 (현금: <span id="cashText" style="color: #38bdf8;">5,000,000</span>원)</span>
+        <span>💰 총 자산: <span id="moneyText" style="color: #10b981;">10,000,000</span>원 (현금: <span id="cashText" style="color: #38bdf8;">10,000,000</span>원)</span>
     </div>
 
     <div id="progressContainer">
-        <div id="progressBar"></div>
-        <div id="progressText">1억 원 목표 달성도: 5%</div>
+        <div id="progressBar" style="width: 10%;"></div>
+        <div id="progressText">1억 원 목표 달성도: 10%</div>
     </div>
 
     <div id="dialogue">💬 방향키로 세련된 벡터 빌딩들을 탐험하고 입구 포탈[▲ / W]로 입장해보세요.</div>
@@ -294,14 +294,14 @@ window.addEventListener('load', () => {
     canvas.focus();
 });
 
-let cash = 5000000;
+let cash = 10000000;
 let turn = 1;
 let isDay = true;
 let currentScene = 'town';
 let ownedBuildings = [];
 const goalMoney = 100000000;
 let isGameOver = false;
-let gameResult = ''; 
+let gameResult = '';
 
 let stocks = [
     { id: 'neotech', name: '🚀 네오 테크', price: 45000, prevPrice: 45000, owned: 0, totalCost: 0, volatility: 0.32 },
@@ -369,7 +369,7 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
     }
     keys[e.key] = true;
-    
+   
     if ((e.key === ' ' || e.key === 'Spacebar') && isCryptoGameActive) {
         stopCryptoMinigame();
         return;
@@ -399,7 +399,7 @@ function getTotalAssets() {
 }
 
 function restartGame() {
-    cash = 5000000;
+    cash = 10000000;
     turn = 1;
     isDay = true;
     currentScene = 'town';
@@ -411,7 +411,7 @@ function restartGame() {
     floatingTexts = [];
     newsArchive = ["[턴 1] 모던 벡터 시티 증권 시장에 6개 우량 및 성장 섹터가 동시 상장되었습니다."];
     currentNews = { text: "모던 벡터 시티 증권 시장에 6개 우량 및 성장 섹터가 동시 상장되었습니다.", stockMod: 0 };
-    
+   
     stocks.forEach(s => {
         s.owned = 0;
         s.totalCost = 0;
@@ -490,7 +490,7 @@ function triggerGameOver(result) {
     if (cryptoGameInterval) clearInterval(cryptoGameInterval);
     const actionArea = document.getElementById('actionArea');
     const dialogue = document.getElementById('dialogue');
-    
+   
     if (gameResult === 'win') {
         dialogue.innerHTML = "🎉 <b>축하합니다! 1억 원을 달성하여 강남 건물주가 되었습니다!</b>";
     } else {
@@ -558,10 +558,11 @@ function renderDialogueOptions(type) {
             `;
         }
     } else if (type === 'realty') {
+        // 오피스텔 가격 2,000만 원 / 월세 500만 원으로 상향 적용
         actionArea.innerHTML = `
-            <button class="action-btn" onclick="buyBuilding('초역세권 오피스텔', 30000000, 2000000)">🏠 오피스텔 (3천만 / 월세 200만)</button>
-            <button class="action-btn" onclick="buyBuilding('테헤란로 빌딩', 60000000, 5000000)">🏢 빌딩 (6천만 / 월세 500만)</button>
-            <button class="action-btn" onclick="buyBuilding('강남 타워', 100000000, 12000000)">🏙️ 강남타워 (1억 / 월세 1200만)</button>
+            <button class="action-btn" onclick="buyBuilding('초역세권 오피스텔', 20000000, 5000000)">🏠 오피스텔 (2천만 / 월세 500만)</button>
+            <button class="action-btn" onclick="buyBuilding('테헤란로 빌딩', 45000000, 12000000)">🏢 빌딩 (4천5백만 / 월세 1200만)</button>
+            <button class="action-btn" onclick="buyBuilding('강남 타워', 80000000, 25000000)">🏙️ 강남타워 (8천만 / 월세 2500만)</button>
             <button class="exit-btn" onclick="exitBuilding()">🚪 나가기</button>
         `;
     }
@@ -571,10 +572,10 @@ function startCryptoMinigame() {
     if (isGameOver) return;
     isCryptoGameActive = true;
     cryptoMultiplier = 1.0;
-    
+   
     const dialogue = document.getElementById('dialogue');
     const actionArea = document.getElementById('actionArea');
-    
+   
     dialogue.innerHTML = "🚀 <b>초고속 사이버 코인 실시간 폭등락 중!</b> 눈 깜짝할 사이에 곤두박질칠 수 있으니 신중하게 <b>[스페이스바]</b>를 누르세요!";
     actionArea.innerHTML = `
         <div style="font-size: 18px; font-weight: 700; color: #f43f5e; margin-bottom: 6px;">현재 배율: <span id="multiplierDisplay">1.00</span>x</div>
@@ -583,9 +584,9 @@ function startCryptoMinigame() {
 
     if (cryptoGameInterval) clearInterval(cryptoGameInterval);
     cryptoGameInterval = setInterval(() => {
-        let delta = (Math.random() * 1.05 - 0.50); 
+        let delta = (Math.random() * 1.05 - 0.50);
         cryptoMultiplier = Math.max(0.02, cryptoMultiplier + delta);
-        
+       
         let span = document.getElementById('multiplierDisplay');
         if (span) {
             span.innerText = cryptoMultiplier.toFixed(2);
@@ -622,8 +623,7 @@ function stopCryptoMinigame() {
 function renderStockMarketUI() {
     const actionArea = document.getElementById('actionArea');
     let html = `<div style="display: flex; gap: 8px; align-items: flex-start;">`;
-    
-    // 왼쪽 1: 6개 주식 종목 거래 구역
+   
     html += `<div style="flex: 1.3; max-height: 155px; overflow-y: auto; padding-right: 4px;">`;
     stocks.forEach(s => {
         let diff = s.price - s.prevPrice;
@@ -650,11 +650,10 @@ function renderStockMarketUI() {
     });
     html += `</div>`;
 
-    // 왼쪽 2: 명확하게 볼 수 있는 '내 보유 주식 현황판' 칸 새로 추가!
     html += `<div style="flex: 1.1; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 6px 8px; max-height: 155px; overflow-y: auto;">
         <div style="font-size: 11px; font-weight: 700; color: #10b981; margin-bottom: 4px; text-align: left;">📋 내 보유 주식 현황판</div>
     `;
-    
+   
     let hasOwnedStocks = false;
     stocks.forEach(s => {
         if (s.owned > 0) {
@@ -681,7 +680,6 @@ function renderStockMarketUI() {
     }
     html += `</div>`;
 
-    // 오른쪽: 실시간 뉴스 속보 게시판 아카이브 구역
     html += `<div style="flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 6px 8px; max-height: 155px; overflow-y: auto;">
         <div style="font-size: 11px; font-weight: 700; color: #38bdf8; margin-bottom: 4px; text-align: left;">📰 실시간 뉴스 속보</div>
     `;
@@ -709,12 +707,12 @@ function executeBuy(stockId) {
     let s = stocks.find(item => item.id === stockId);
     let totalCost = s.price * qty;
     if (cash < totalCost) { alert("현금이 부족합니다!"); return; }
-    
+   
     cash -= totalCost;
     s.totalCost += totalCost;
     s.owned += qty;
     addFloatingText(-totalCost);
-    
+   
     updateUI();
     renderStockMarketUI();
 }
@@ -744,7 +742,7 @@ function executeSell(stockId) {
 
     let sellQty = Math.min(qty, s.owned);
     let avgCost = s.owned > 0 ? (s.totalCost / s.owned) : 0;
-    
+   
     let revenue = s.price * sellQty;
     cash += revenue;
 
@@ -757,7 +755,7 @@ function executeSell(stockId) {
     }
 
     addFloatingText(revenue);
-    
+   
     updateUI();
     renderStockMarketUI();
 }
@@ -791,7 +789,7 @@ function processTurn() {
         cash += rentSum;
         addFloatingText(rentSum);
     }
-    
+   
     let currentTotalAssets = getTotalAssets();
 
     if (currentTotalAssets >= goalMoney) {
@@ -801,20 +799,20 @@ function processTurn() {
     }
 
     turn += 1;
-    
+   
     if (turn > 12) {
         turn = 12;
         updateUI();
         triggerGameOver('lose');
         return;
     }
-    
+   
     if (Math.random() < 0.8) {
         currentNews = newsEvents[Math.floor(Math.random() * newsEvents.length)];
     } else {
         currentNews = { text: "시티 증권 시장이 특별한 이슈 없이 균형 잡힌 흐름을 보이고 있습니다.", stockMod: 0 };
     }
-    
+   
     let newsFormatted = `[턴 ${turn}] ${currentNews.text}`;
     newsArchive.push(newsFormatted);
     document.getElementById('newsText').innerText = currentNews.text;
@@ -852,7 +850,7 @@ function buyBuilding(name, price, rent) {
     addFloatingText(-price);
     ownedBuildings.push({ name, rent });
     canvas.focus();
-    
+   
     if (getTotalAssets() >= goalMoney) {
         updateUI();
         triggerGameOver('win');
@@ -902,7 +900,7 @@ function update() {
 
         checkProximity();
     }
-    
+   
     draw();
     requestAnimationFrame(update);
 }
@@ -1015,7 +1013,7 @@ function drawTown() {
         let px = b.portalX;
         let py = 320;
         let scale = Math.sin(portalAnim) * 6;
-        
+       
         ctx.save();
         ctx.strokeStyle = b.accent;
         ctx.lineWidth = 4;
@@ -1037,7 +1035,7 @@ function drawInterior() {
 
     ctx.fillStyle = '#0f172a';
     ctx.fillRect(0, 0, 840, 480);
-    
+   
     ctx.fillStyle = '#1e293b';
     ctx.fillRect(0, 0, 840, 90);
 
