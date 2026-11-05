@@ -30,7 +30,7 @@ game_html = """
         color: #38bdf8;
         font-size: 14px;
         font-weight: 600;
-        padding: 12px 20px;
+        padding: 10px 18px;
         border-radius: 16px 16px 0 0;
         border: 1px solid rgba(56, 189, 248, 0.3);
         border-bottom: none;
@@ -68,9 +68,9 @@ game_html = """
         width: 840px;
         background: rgba(15, 23, 42, 0.85);
         backdrop-filter: blur(12px);
-        padding: 20px;
+        padding: 16px 20px;
         border-radius: 16px;
-        margin-top: 14px;
+        margin-top: 12px;
         box-sizing: border-box;
         border: 1px solid rgba(56, 189, 248, 0.25);
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -78,20 +78,20 @@ game_html = """
     .status-bar {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         font-weight: 600;
         color: #e2e8f0;
-        font-size: 15px;
+        font-size: 14px;
     }
     #progressContainer {
         width: 100%;
-        height: 22px;
+        height: 20px;
         background: rgba(30, 41, 59, 0.8);
-        border-radius: 11px;
+        border-radius: 10px;
         position: relative;
         overflow: hidden;
         border: 1px solid rgba(56, 189, 248, 0.2);
-        margin-bottom: 14px;
+        margin-bottom: 10px;
     }
     #progressBar {
         width: 1%;
@@ -106,9 +106,9 @@ game_html = """
         height: 100%;
         top: 0;
         left: 0;
-        font-size: 12px;
+        font-size: 11px;
         text-align: center;
-        line-height: 22px;
+        line-height: 20px;
         color: white;
         font-weight: 600;
         text-shadow: 0 1px 2px rgba(0,0,0,0.6);
@@ -117,42 +117,42 @@ game_html = """
         background: linear-gradient(135deg, #3b82f6, #1d4ed8);
         color: white;
         border: none;
-        padding: 9px 16px;
-        margin: 4px;
-        border-radius: 10px;
+        padding: 6px 12px;
+        margin: 2px;
+        border-radius: 8px;
         cursor: pointer;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
-        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
-        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        transition: all 0.15s ease;
     }
     .action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(59, 130, 246, 0.6);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.6);
     }
     .sell-btn {
         background: linear-gradient(135deg, #f43f5e, #e11d48);
         color: white;
         border: none;
-        padding: 9px 16px;
-        margin: 4px;
-        border-radius: 10px;
+        padding: 6px 12px;
+        margin: 2px;
+        border-radius: 8px;
         cursor: pointer;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
-        box-shadow: 0 4px 14px rgba(244, 63, 94, 0.4);
+        box-shadow: 0 2px 8px rgba(244, 63, 94, 0.4);
     }
     .enter-btn {
         background: linear-gradient(135deg, #10b981, #059669);
         color: white;
         border: none;
-        padding: 12px 26px;
+        padding: 10px 22px;
         border-radius: 10px;
         cursor: pointer;
         font-family: 'Pretendard', sans-serif;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 600;
         box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
     }
@@ -160,41 +160,38 @@ game_html = """
         background: linear-gradient(135deg, #64748b, #475569);
         color: white;
         border: none;
-        padding: 9px 16px;
+        padding: 8px 16px;
         margin: 4px;
-        border-radius: 10px;
+        border-radius: 8px;
         cursor: pointer;
         font-family: 'Pretendard', sans-serif;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
     }
     .restart-btn {
         background: linear-gradient(135deg, #f59e0b, #d97706);
         color: white;
         border: none;
-        padding: 14px 36px;
-        border-radius: 12px;
+        padding: 12px 30px;
+        border-radius: 10px;
         cursor: pointer;
         font-family: 'Pretendard', sans-serif;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 700;
         box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
         transition: all 0.2s ease;
-    }
-    .restart-btn:hover {
-        transform: scale(1.05);
     }
     .controls {
         display: grid;
         grid-template-columns: repeat(4, 90px);
         gap: 12px;
         justify-content: center;
-        margin-top: 16px;
+        margin-top: 14px;
     }
     .ctrl-btn {
         width: 90px;
-        height: 56px;
-        font-size: 16px;
+        height: 50px;
+        font-size: 15px;
         font-weight: 600;
         font-family: 'Pretendard', sans-serif;
         background: rgba(30, 41, 59, 0.9);
@@ -210,22 +207,22 @@ game_html = """
         background: rgba(56, 189, 248, 0.2);
     }
     #dialogue {
-        min-height: 52px;
+        min-height: 40px;
         background: rgba(15, 23, 42, 0.6);
-        padding: 14px;
-        border-radius: 12px;
+        padding: 10px 14px;
+        border-radius: 10px;
         border: 1px solid rgba(56, 189, 248, 0.15);
-        margin-top: 8px;
-        font-size: 15px;
-        line-height: 1.6;
+        margin-top: 6px;
+        font-size: 14px;
+        line-height: 1.5;
         color: #cbd5e1;
     }
     .stock-card {
         background: rgba(30, 41, 59, 0.6);
         border: 1px solid rgba(56, 189, 248, 0.2);
-        border-radius: 10px;
-        padding: 10px 14px;
-        margin-bottom: 8px;
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin-bottom: 6px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -257,7 +254,7 @@ game_html = """
     </div>
 
     <div id="dialogue">💬 방향키로 세련된 벡터 빌딩들을 탐험하고 입구 포탈[▲ / W]로 입장해보세요.</div>
-    <div id="actionArea" style="margin-top: 10px; text-align: center;"></div>
+    <div id="actionArea" style="margin-top: 8px; text-align: center;"></div>
 </div>
 
 <div class="controls">
@@ -277,14 +274,13 @@ window.addEventListener('load', () => {
 
 let cash = 1000000;
 let turn = 1;
-let isDay = true; // 아침/밤 상태 플래그
+let isDay = true;
 let currentScene = 'town';
 let ownedBuildings = [];
 const goalMoney = 100000000;
 let isGameOver = false;
 let gameResult = ''; 
 
-// 가상 주식 종목 데이터
 let stocks = [
     { id: 'neotech', name: '🚀 네오 테크', price: 50000, prevPrice: 50000, owned: 0, totalCost: 0, volatility: 0.35 },
     { id: 'bluechips', name: '🛡️ 블루 칩스', price: 100000, prevPrice: 100000, owned: 0, totalCost: 0, volatility: 0.10 },
@@ -516,7 +512,7 @@ function renderDialogueOptions(type) {
 
 function renderStockMarketUI() {
     const actionArea = document.getElementById('actionArea');
-    let html = `<div style="max-height:220px; overflow-y:auto; margin-bottom:8px;">`;
+    let html = `<div style="max-height:165px; overflow-y:auto; margin-bottom:6px;">`;
     
     stocks.forEach(s => {
         let diff = s.price - s.prevPrice;
@@ -529,9 +525,9 @@ function renderStockMarketUI() {
         html += `
             <div class="stock-card">
                 <div style="text-align:left;">
-                    <span style="font-weight:700; color:#ffffff;">${s.name}</span>
-                    <span style="font-size:13px; color:${color}; margin-left:8px;">${s.price.toLocaleString()}원 (${sign}${rate}%)</span>
-                    <div style="font-size:12px; color:#cbd5e1; margin-top:2px;">보유: ${s.owned}주 | 평단: ${avgCost.toLocaleString()}원 | 수익률: <span style="color:${returnRate >= 0 ? '#10b981':'#f43f5e'}">${returnRate}%</span></div>
+                    <span style="font-weight:700; color:#ffffff; font-size:13px;">${s.name}</span>
+                    <span style="font-size:12px; color:${color}; margin-left:6px;">${s.price.toLocaleString()}원 (${sign}${rate}%)</span>
+                    <div style="font-size:11px; color:#cbd5e1; margin-top:2px;">보유: ${s.owned}주 | 평단: ${avgCost.toLocaleString()}원 | 수익률: <span style="color:${returnRate >= 0 ? '#10b981':'#f43f5e'}">${returnRate}%</span></div>
                 </div>
                 <div>
                     <button class="action-btn" onclick="buyStock('${s.id}', 1)">1주 매수</button>
@@ -544,8 +540,10 @@ function renderStockMarketUI() {
     });
 
     html += `</div>
-        <button class="enter-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);" onclick="passTurnByStock()">🌙 턴 마치기 (주식 변동 & 아침/밤 전환)</button>
-        <button class="exit-btn" onclick="exitBuilding()">🚪 나가기</button>
+        <div style="margin-top: 4px;">
+            <button class="enter-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 8px 18px; font-size: 14px;" onclick="passTurnByStock()">🌙 턴 마치기 (주식 변동 & 아침/밤 전환)</button>
+            <button class="exit-btn" onclick="exitBuilding()">🚪 나가기</button>
+        </div>
     `;
 
     actionArea.innerHTML = html;
@@ -573,7 +571,6 @@ function sellStock(stockId, qty) {
     let sellQty = (qty === 5) ? s.owned : Math.min(qty, s.owned);
     let revenue = s.price * sellQty;
     
-    // 평단가 차감 처리
     let avgCost = s.totalCost / s.owned;
     s.owned -= sellQty;
     s.totalCost -= (avgCost * sellQty);
@@ -595,22 +592,19 @@ function updateStockPrices() {
         s.prevPrice = s.price;
         let changePercent = (Math.random() * (s.volatility * 2) - s.volatility) + currentNews.stockMod;
         let newPrice = Math.floor(s.price * (1 + changePercent));
-        s.price = Math.max(1000, newPrice); // 최소 주가 제한
+        s.price = Math.max(1000, newPrice);
     });
 }
 
 function processTurn() {
     if (isGameOver) return;
 
-    // 턴 경과 시 밤/아침 배경 연출 전환
     isDay = !isDay;
     document.getElementById('dayNightText').innerText = isDay ? "아침 🌅" : "밤 🌙";
     document.getElementById('dayNightText').style.color = isDay ? "#fbbf24" : "#a855f7";
 
-    // 주식 가격 갱신
     updateStockPrices();
 
-    // 건물 월세 수입
     let rentSum = 0;
     ownedBuildings.forEach(b => rentSum += b.rent);
     if (rentSum > 0) {
@@ -620,17 +614,14 @@ function processTurn() {
     
     let currentTotalAssets = getTotalAssets();
 
-    // 1억 원 목표 달성 체크 (즉시 승리)
     if (currentTotalAssets >= goalMoney) {
         updateUI();
         triggerGameOver('win');
         return;
     }
 
-    // 턴 증가
     turn += 1;
     
-    // 12턴 초과 시 게임 종료 판정
     if (turn > 12) {
         turn = 12;
         updateUI();
@@ -671,7 +662,7 @@ function investBank() {
 
 function investCrypto() {
     if (isGameOver) return;
-    let rate = (Math.random() * 1.5) - 0.5; // -50% ~ +100%
+    let rate = (Math.random() * 1.5) - 0.5;
     let gainLoss = Math.floor(cash * rate);
     cash += gainLoss;
     addFloatingText(gainLoss);
@@ -785,19 +776,17 @@ function draw() {
 }
 
 function drawTown() {
-    // 아침/밤 배경 연출 Gradient
     let skyGradient = ctx.createLinearGradient(0, 0, 0, 260);
     if (isDay) {
-        skyGradient.addColorStop(0, '#0284c7'); // 아침 하늘 (Bright Blue)
+        skyGradient.addColorStop(0, '#0284c7');
         skyGradient.addColorStop(1, '#38bdf8');
     } else {
-        skyGradient.addColorStop(0, '#090d16'); // 밤 하늘 (Dark Navy)
+        skyGradient.addColorStop(0, '#090d16');
         skyGradient.addColorStop(1, '#1e293b');
     }
     ctx.fillStyle = skyGradient;
     ctx.fillRect(cameraX, 0, canvas.width, 260);
 
-    // 아침 태양 / 밤 달 렌더링
     ctx.save();
     if (isDay) {
         ctx.fillStyle = '#fbbf24';
@@ -947,7 +936,7 @@ function drawVectorPlayer(x, y, facing) {
 
     ctx.fillStyle = '#fce7f3';
     ctx.beginPath();
-    ctx.roundRect(x - 10, y - 30 + bounce, 20, 16, [6]);
+    ctx.roundRect(x - 10, y - 30, 20, 16, [6]);
     ctx.fill();
 
     if (totalAssets >= 50000000) {
@@ -1040,4 +1029,4 @@ requestAnimationFrame(update);
 </html>
 """
 
-components.html(game_html, height=920)
+components.html(game_html, height=980)
