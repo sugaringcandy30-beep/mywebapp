@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 코인 미니게임의 급등락 변동성이 극대화되었습니다.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 코인 미니게임이 극단적인 대폭 하락 및 상승을 오가도록 수정되었습니다.")
 
 game_html = """
 <!DOCTYPE html>
@@ -357,7 +357,7 @@ let portalAnim = 0;
 let keys = {};
 let lastProximityKey = null;
 
-// 코인 0.1초 단위 초고속 급등락 미니게임 상태 변수
+// 코인 0.1초 단위 상하 폭등/폭락 미니게임 상태 변수
 let isCryptoGameActive = false;
 let cryptoMultiplier = 1.0;
 let cryptoGameInterval = null;
@@ -369,7 +369,7 @@ document.addEventListener('keydown', (e) => {
     }
     keys[e.key] = true;
     
-    // 코인 미니게임 중 스페이스바를 누르면 타이밍 캐치!
+    // 코인 미니게임 중 스페이스바를 누르면 매도/확정!
     if ((e.key === ' ' || e.key === 'Spacebar') && isCryptoGameActive) {
         stopCryptoMinigame();
         return;
@@ -553,7 +553,7 @@ function renderDialogueOptions(type) {
     } else if (type === 'crypto') {
         if (!isCryptoGameActive) {
             actionArea.innerHTML = `
-                <button class="action-btn" style="background: linear-gradient(135deg, #f43f5e, #e11d48); padding: 8px 20px; font-size: 14px;" onclick="startCryptoMinigame()">🚀 초고속 급등락 코인 미니게임 시작 (스페이스바로 매도!)</button>
+                <button class="action-btn" style="background: linear-gradient(135deg, #f43f5e, #e11d48); padding: 8px 20px; font-size: 14px;" onclick="startCryptoMinigame()">🚀 사이버 코인 급등락 미니게임 시작 (스페이스바로 매도!)</button>
                 <div style="margin-top: 6px;"><button class="exit-btn" onclick="exitBuilding()">🚪 나가기</button></div>
             `;
         }
@@ -567,7 +567,7 @@ function renderDialogueOptions(type) {
     }
 }
 
-// 0.1초 단위 초고속 급등락 코인 타이밍 미니게임 시작 함수
+// 0.1초 단위 상하 폭등/폭락 코인 타이밍 미니게임 시작 함수
 function startCryptoMinigame() {
     if (isGameOver) return;
     isCryptoGameActive = true;
@@ -576,17 +576,17 @@ function startCryptoMinigame() {
     const dialogue = document.getElementById('dialogue');
     const actionArea = document.getElementById('actionArea');
     
-    dialogue.innerHTML = "🚀 <b>초고속 급등락 코인 미니게임 진행 중!</b> 0.1초마다 폭등과 폭락을 오갑니다. 적절한 순간에 <b>[스페이스바]</b>를 누르거나 아래 버튼을 누르세요!";
+    dialogue.innerHTML = "🚀 <b>사이버 코인 실시간 급등락 중!</b> 순식간에 마이너스로 꽂힐 수 있으니 눈치껏 <b>[스페이스바]</b>를 누르세요!";
     actionArea.innerHTML = `
         <div style="font-size: 18px; font-weight: 700; color: #f43f5e; margin-bottom: 6px;">현재 배율: <span id="multiplierDisplay">1.00</span>x</div>
         <button class="action-btn" style="background: linear-gradient(135deg, #f43f5e, #e11d48); padding: 10px 24px; font-size: 15px;" onclick="stopCryptoMinigame()">🛑 지금 매도 (수익/손실 확정 & 턴 진행)</button>
     `;
 
     if (cryptoGameInterval) clearInterval(cryptoGameInterval);
-    // 0.1초(100ms) 단위로 급등락 진동 폭 대폭 확대
+    // 0.1초(100ms)마다 대폭 폭등(+45%)과 대폭 폭락(-45%)이 널뛰기하도록 설정
     cryptoGameInterval = setInterval(() => {
-        let delta = (Math.random() * 0.8 - 0.38); // -38% ~ +42% 순간 변동
-        cryptoMultiplier = Math.max(0.1, cryptoMultiplier + delta);
+        let delta = (Math.random() * 0.9 - 0.45); 
+        cryptoMultiplier = Math.max(0.05, cryptoMultiplier + delta);
         
         let span = document.getElementById('multiplierDisplay');
         if (span) {
@@ -596,7 +596,7 @@ function startCryptoMinigame() {
     }, 100);
 }
 
-// 코인 타이밍 미니게임 종료 및 정산 함수
+// 코인 타이밍 미니게임 종료 및 정산 함수 (자산 증가 및 감소 모두 반영)
 function stopCryptoMinigame() {
     if (!isCryptoGameActive) return;
     isCryptoGameActive = false;
@@ -612,9 +612,9 @@ function stopCryptoMinigame() {
 
     const dialogue = document.getElementById('dialogue');
     if (finalRate < 0) {
-        dialogue.innerHTML = `💥 <b>코인 폭락 타이밍 캐치!</b> 손실을 입었습니다! (${gainLoss.toLocaleString()}원, 최종 배율: ${cryptoMultiplier.toFixed(2)}x)`;
+        dialogue.innerHTML = `💥 <b>코인 폭락 직격탄!</b> 손실을 입었습니다! (${gainLoss.toLocaleString()}원, 최종 배율: ${cryptoMultiplier.toFixed(2)}x)`;
     } else {
-        dialogue.innerHTML = `🎉 <b>코인 급등 타이밍 캐치 성공!</b> 배율 <b>${cryptoMultiplier.toFixed(2)}x</b>로 정산되어 하룻밤이 지나갑니다!`;
+        dialogue.innerHTML = `🎉 <b>코인 급등 타이밍 성공!</b> 배율 <b>${cryptoMultiplier.toFixed(2)}x</b>로 수익이 확정되어 하룻밤이 지나갑니다!`;
     }
 
     setTimeout(() => {
