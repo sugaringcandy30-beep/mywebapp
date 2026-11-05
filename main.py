@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 주식 매수/매도와 자산 관리로 12턴 안에 1억 원을 달성하세요.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 실시간 뉴스 속보를 참고하여 주식 매수/매도로 1억 원을 달성하세요.")
 
 game_html = """
 <!DOCTYPE html>
@@ -25,7 +25,7 @@ game_html = """
     }
     #newsTickerBox {
         width: 840px;
-        background: rgba(30, 41, 59, 0.7);
+        background: rgba(30, 41, 59, 0.75);
         backdrop-filter: blur(10px);
         color: #38bdf8;
         font-size: 14px;
@@ -227,13 +227,23 @@ game_html = """
         justify-content: space-between;
         align-items: center;
     }
+    .news-item {
+        background: rgba(30, 41, 59, 0.5);
+        border-left: 3px solid #38bdf8;
+        padding: 6px 10px;
+        margin-bottom: 6px;
+        border-radius: 4px;
+        font-size: 12px;
+        text-align: left;
+        color: #e2e8f0;
+    }
 </style>
 </head>
 <body>
 
 <div id="newsTickerBox">
-    <span id="newsTag">속보</span>
-    <span id="newsText">모던 벡터 시티 금융 시장이 개장했습니다. 주식을 매수하고 턴을 넘겨 가격 변동을 확인하세요!</span>
+    <span id="newsTag">실시간 속보</span>
+    <span id="newsText">모던 벡터 시티 금융 시장이 개장했습니다. 시황을 예의주시하세요.</span>
 </div>
 
 <div id="gameContainer">
@@ -288,13 +298,17 @@ let stocks = [
 ];
 
 let floatingTexts = [];
+let newsArchive = [
+    "[턴 1] 모던 벡터 시티 금융 시장 정식 개장. 투자자들의 기대감 고조."
+];
 
-let currentNews = { text: "시티 금융 시장이 개장했습니다.", stockMod: 0 };
+let currentNews = { text: "모던 벡터 시티 금융 시장 정식 개장. 투자자들의 기대감 고조.", stockMod: 0 };
+
 const newsEvents = [
-    { text: "🔥 [속보] 혁신 기술 기업 대형 호재 발생! 주식 시장 전반 강세!", stockMod: 0.25 },
-    { text: "📉 [속보] 글로벌 자산 규제 강화 발표! 주가 변동성 확대 경고!", stockMod: -0.20 },
-    { text: "🚀 [속보] 중앙은행 유동성 공급 정책 발표! 기술주 폭등!", stockMod: 0.30 },
-    { text: "⚠️ [속보] 금리 인상 확정 발표! 시장 투자 심리 급냉각!", stockMod: -0.15 }
+    { text: "🔥 [특보] 테크 기업 연합 대규모 설비 투자 단행... 시장의 자금이 한 곳으로 몰릴 조짐이 보입니다.", stockMod: 0.28 },
+    { text: "📉 [긴급] 글로벌 무역 긴장감 고조 및 리스크 회피 심리 확산... 안전 자산 선호가 대두될 수 있습니다.", stockMod: -0.22 },
+    { text: "🚀 [속보] 중앙은행의 전격적인 유동성 확장 정책 시사... 증시에 강력한 순풍이 불어 닥칠 전망입니다.", stockMod: 0.32 },
+    { text: "⚠️ [경고] 예상보다 매서운 물가 상승 압력 포착... 투자자들 사이에서 긴축 우려가 조심스럽게 피어오릅니다.", stockMod: -0.18 }
 ];
 
 const player = {
@@ -368,6 +382,8 @@ function restartGame() {
     isGameOver = false;
     gameResult = '';
     floatingTexts = [];
+    newsArchive = ["[턴 1] 모던 벡터 시티 금융 시장 정식 개장. 투자자들의 기대감 고조."];
+    currentNews = { text: "모던 벡터 시티 금융 시장 정식 개장. 투자자들의 기대감 고조.", stockMod: 0 };
     
     stocks.forEach(s => {
         s.owned = 0;
@@ -512,8 +528,10 @@ function renderDialogueOptions(type) {
 
 function renderStockMarketUI() {
     const actionArea = document.getElementById('actionArea');
-    let html = `<div style="max-height:165px; overflow-y:auto; margin-bottom:6px;">`;
+    let html = `<div style="display: flex; gap: 10px; align-items: flex-start;">`;
     
+    // 왼쪽: 주식 거래 구역
+    html += `<div style="flex: 1.3; max-height: 155px; overflow-y: auto; padding-right: 4px;">`;
     stocks.forEach(s => {
         let diff = s.price - s.prevPrice;
         let rate = (diff / s.prevPrice * 100).toFixed(1);
@@ -525,23 +543,31 @@ function renderStockMarketUI() {
         html += `
             <div class="stock-card">
                 <div style="text-align:left;">
-                    <span style="font-weight:700; color:#ffffff; font-size:13px;">${s.name}</span>
-                    <span style="font-size:12px; color:${color}; margin-left:6px;">${s.price.toLocaleString()}원 (${sign}${rate}%)</span>
-                    <div style="font-size:11px; color:#cbd5e1; margin-top:2px;">보유: ${s.owned}주 | 평단: ${avgCost.toLocaleString()}원 | 수익률: <span style="color:${returnRate >= 0 ? '#10b981':'#f43f5e'}">${returnRate}%</span></div>
+                    <span style="font-weight:700; color:#ffffff; font-size:12px;">${s.name}</span>
+                    <span style="font-size:11px; color:${color}; margin-left:4px;">${s.price.toLocaleString()}원 (${sign}${rate}%)</span>
+                    <div style="font-size:10px; color:#cbd5e1; margin-top:1px;">보유: ${s.owned}주 | 평단: ${avgCost.toLocaleString()}원 | 수익률: <span style="color:${returnRate >= 0 ? '#10b981':'#f43f5e'}">${returnRate}%</span></div>
                 </div>
                 <div>
-                    <button class="action-btn" onclick="buyStock('${s.id}', 1)">1주 매수</button>
-                    <button class="action-btn" onclick="buyStock('${s.id}', 5)">5주 매수</button>
-                    <button class="sell-btn" onclick="sellStock('${s.id}', 1)">1주 매도</button>
-                    <button class="sell-btn" onclick="sellStock('${s.id}', 5)">전량 매도</button>
+                    <button class="action-btn" style="font-size:11px; padding:4px 8px;" onclick="buyStock('${s.id}', 1)">매수</button>
+                    <button class="sell-btn" style="font-size:11px; padding:4px 8px;" onclick="sellStock('${s.id}', 5)">매도</button>
                 </div>
             </div>
         `;
     });
+    html += `</div>`;
+
+    // 오른쪽: 실시간 뉴스 게시판 아카이브 구역
+    html += `<div style="flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 6px 10px; max-height: 155px; overflow-y: auto;">
+        <div style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-bottom: 4px; text-align: left;">📰 실시간 뉴스 속보 게시판</div>
+    `;
+    newsArchive.slice().reverse().forEach(n => {
+        html += `<div class="news-item">${n}</div>`;
+    });
+    html += `</div>`;
 
     html += `</div>
-        <div style="margin-top: 4px;">
-            <button class="enter-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 8px 18px; font-size: 14px;" onclick="passTurnByStock()">🌙 턴 마치기 (주식 변동 & 아침/밤 전환)</button>
+        <div style="margin-top: 6px;">
+            <button class="enter-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 7px 16px; font-size: 13px;" onclick="passTurnByStock()">🌙 턴 마치기 (주식 변동 & 아침/밤 전환)</button>
             <button class="exit-btn" onclick="exitBuilding()">🚪 나가기</button>
         </div>
     `;
@@ -629,11 +655,14 @@ function processTurn() {
         return;
     }
     
-    if (Math.random() < 0.75) {
+    if (Math.random() < 0.8) {
         currentNews = newsEvents[Math.floor(Math.random() * newsEvents.length)];
     } else {
-        currentNews = { text: "시티 금융 시장이 안정세를 유지하고 있습니다.", stockMod: 0 };
+        currentNews = { text: "시티 금융 시장이 특별한 이슈 없이 평온한 흐름을 보이고 있습니다.", stockMod: 0 };
     }
+    
+    let newsFormatted = `[턴 ${turn}] ${currentNews.text}`;
+    newsArchive.push(newsFormatted);
     document.getElementById('newsText').innerText = currentNews.text;
 
     updateUI();
