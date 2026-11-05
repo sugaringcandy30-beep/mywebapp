@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 다양한 주식 종목과 자유로운 수량 지정 매매로 1억 원을 달성하세요.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 매수·매도 종료 버튼으로 하룻밤을 보내며 1억 원을 달성하세요.")
 
 game_html = """
 <!DOCTYPE html>
@@ -253,7 +253,7 @@ game_html = """
 
 <div id="newsTickerBox">
     <span id="newsTag">실시간 속보</span>
-    <span id="newsText">모던 벡터 시티 증권 시장이 개장했습니다. 다양한 종목을 분석하고 투자하세요!</span>
+    <span id="newsText">모던 벡터 시티 증권 시장이 개장했습니다. 종목을 매매하고 하룻밤을 보내세요!</span>
 </div>
 
 <div id="gameContainer">
@@ -301,7 +301,6 @@ const goalMoney = 100000000;
 let isGameOver = false;
 let gameResult = ''; 
 
-// 다양한 주식 종목 대폭 확대 (6개 종목)
 let stocks = [
     { id: 'neotech', name: '🚀 네오 테크', price: 45000, prevPrice: 45000, owned: 0, totalCost: 0, volatility: 0.32 },
     { id: 'bluechips', name: '🛡️ 블루 칩스', price: 120000, prevPrice: 120000, owned: 0, totalCost: 0, volatility: 0.08 },
@@ -515,7 +514,7 @@ function checkProximity() {
                 dialogue.innerHTML = "🚪 메인 스트리트로 나가는 출구입니다.";
                 actionArea.innerHTML = `<button class="exit-btn" onclick="exitBuilding()">🚪 밖으로 나가기</button>`;
             } else if (zone === 'npc') {
-                dialogue.innerHTML = `💬 <b>${npc.name}</b>: "어서오세요! 원하는 수량을 입력하거나 버튼으로 간편하게 매매하세요."`;
+                dialogue.innerHTML = `💬 <b>${npc.name}</b>: "어서오세요! 주식 매매를 완료하셨다면 아래 버튼을 눌러 하룻밤을 보내세요."`;
                 renderDialogueOptions(currentScene);
             } else {
                 dialogue.innerHTML = `🏢 컨설팅 데스크로 가까이 다가가세요.`;
@@ -547,7 +546,7 @@ function renderStockMarketUI() {
     const actionArea = document.getElementById('actionArea');
     let html = `<div style="display: flex; gap: 10px; align-items: flex-start;">`;
     
-    // 왼쪽: 6개 주식 종목 거래 구역 (스크롤 지원)
+    // 왼쪽: 6개 주식 종목 거래 구역
     html += `<div style="flex: 1.4; max-height: 155px; overflow-y: auto; padding-right: 4px;">`;
     stocks.forEach(s => {
         let diff = s.price - s.prevPrice;
@@ -588,7 +587,7 @@ function renderStockMarketUI() {
 
     html += `</div>
         <div style="margin-top: 6px;">
-            <button class="enter-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 7px 16px; font-size: 13px;" onclick="passTurnByStock()">🌙 턴 마치기 (주식 변동 & 아침/밤 전환)</button>
+            <button class="enter-btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 7px 16px; font-size: 13px;" onclick="passTurnByStock()">🌙 매수·매도 종료하기 (하룻밤 지나기)</button>
             <button class="exit-btn" onclick="exitBuilding()">🚪 나가기</button>
         </div>
     `;
