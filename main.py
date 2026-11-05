@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 주식 매수/매도 시 잔고와 매수가능 수량이 즉시 실시간 반영됩니다.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 다양한 주식 종목과 자유로운 수량 지정 매매로 1억 원을 달성하세요.")
 
 game_html = """
 <!DOCTYPE html>
@@ -117,32 +117,32 @@ game_html = """
         background: linear-gradient(135deg, #3b82f6, #1d4ed8);
         color: white;
         border: none;
-        padding: 6px 12px;
+        padding: 5px 10px;
         margin: 2px;
-        border-radius: 8px;
+        border-radius: 6px;
         cursor: pointer;
         font-family: 'Pretendard', sans-serif;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
-        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
         transition: all 0.15s ease;
     }
     .action-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.6);
+        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.6);
     }
     .sell-btn {
         background: linear-gradient(135deg, #f43f5e, #e11d48);
         color: white;
         border: none;
-        padding: 6px 12px;
+        padding: 5px 10px;
         margin: 2px;
-        border-radius: 8px;
+        border-radius: 6px;
         cursor: pointer;
         font-family: 'Pretendard', sans-serif;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
-        box-shadow: 0 2px 8px rgba(244, 63, 94, 0.4);
+        box-shadow: 0 2px 6px rgba(244, 63, 94, 0.4);
     }
     .enter-btn {
         background: linear-gradient(135deg, #10b981, #059669);
@@ -227,6 +227,16 @@ game_html = """
         justify-content: space-between;
         align-items: center;
     }
+    .stock-input {
+        width: 50px;
+        background: #0f172a;
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        color: white;
+        text-align: center;
+        border-radius: 4px;
+        padding: 3px;
+        font-size: 12px;
+    }
     .news-item {
         background: rgba(30, 41, 59, 0.5);
         border-left: 3px solid #38bdf8;
@@ -243,7 +253,7 @@ game_html = """
 
 <div id="newsTickerBox">
     <span id="newsTag">실시간 속보</span>
-    <span id="newsText">모던 벡터 시티 금융 시장이 개장했습니다. 시황을 예의주시하세요.</span>
+    <span id="newsText">모던 벡터 시티 증권 시장이 개장했습니다. 다양한 종목을 분석하고 투자하세요!</span>
 </div>
 
 <div id="gameContainer">
@@ -291,24 +301,28 @@ const goalMoney = 100000000;
 let isGameOver = false;
 let gameResult = ''; 
 
+// 다양한 주식 종목 대폭 확대 (6개 종목)
 let stocks = [
-    { id: 'neotech', name: '🚀 네오 테크', price: 50000, prevPrice: 50000, owned: 0, totalCost: 0, volatility: 0.35 },
-    { id: 'bluechips', name: '🛡️ 블루 칩스', price: 100000, prevPrice: 100000, owned: 0, totalCost: 0, volatility: 0.10 },
-    { id: 'cyberenergy', name: '⚡ 사이버 에너지', price: 20000, prevPrice: 20000, owned: 0, totalCost: 0, volatility: 0.22 }
+    { id: 'neotech', name: '🚀 네오 테크', price: 45000, prevPrice: 45000, owned: 0, totalCost: 0, volatility: 0.32 },
+    { id: 'bluechips', name: '🛡️ 블루 칩스', price: 120000, prevPrice: 120000, owned: 0, totalCost: 0, volatility: 0.08 },
+    { id: 'cyberenergy', name: '⚡ 사이버 에너지', price: 18000, prevPrice: 18000, owned: 0, totalCost: 0, volatility: 0.24 },
+    { id: 'biocore', name: '🧬 바이오 코어', price: 32000, prevPrice: 32000, owned: 0, totalCost: 0, volatility: 0.40 },
+    { id: 'pixelgame', name: '🎮 픽셀 게임즈', price: 15000, prevPrice: 15000, owned: 0, totalCost: 0, volatility: 0.28 },
+    { id: 'quantumsem', name: '💻 퀀텀 반도체', price: 75000, prevPrice: 75000, owned: 0, totalCost: 0, volatility: 0.18 }
 ];
 
 let floatingTexts = [];
 let newsArchive = [
-    "[턴 1] 모던 벡터 시티 금융 시장 정식 개장. 투자자들의 기대감 고조."
+    "[턴 1] 모던 벡터 시티 증권 시장에 6개 우량 및 성장 섹터가 동시 상장되었습니다."
 ];
 
-let currentNews = { text: "모던 벡터 시티 금융 시장 정식 개장. 투자자들의 기대감 고조.", stockMod: 0 };
+let currentNews = { text: "모던 벡터 시티 증권 시장에 6개 우량 및 성장 섹터가 동시 상장되었습니다.", stockMod: 0 };
 
 const newsEvents = [
-    { text: "🔥 [특보] 테크 기업 연합 대규모 설비 투자 단행... 시장의 자금이 한 곳으로 몰릴 조짐이 보입니다.", stockMod: 0.28 },
-    { text: "📉 [긴급] 글로벌 무역 긴장감 고조 및 리스크 회피 심리 확산... 안전 자산 선호가 대두될 수 있습니다.", stockMod: -0.22 },
-    { text: "🚀 [속보] 중앙은행의 전격적인 유동성 확장 정책 시사... 증시에 강력한 순풍이 불어 닥칠 전망입니다.", stockMod: 0.32 },
-    { text: "⚠️ [경고] 예상보다 매서운 물가 상승 압력 포착... 투자자들 사이에서 긴축 우려가 조심스럽게 피어오릅니다.", stockMod: -0.18 }
+    { text: "🔥 [특보] 차세대 기술 혁신 펀드 유입으로 성장 테크 및 반도체 섹터의 강한 상승세가 예상됩니다.", stockMod: 0.26 },
+    { text: "📉 [긴급] 글로벌 원자재 공급망 차질 우려... 방어주와 에너지 중심으로 리스크 관리가 필요합니다.", stockMod: -0.20 },
+    { text: "🚀 [속보] 확장적 통화 정책 시행 임박... 전반적인 증시 유동성 랠리가 기대됩니다.", stockMod: 0.30 },
+    { text: "⚠️ [경고] 금리 인상 기조 장기화 우려로 투자 심리가 위축되며 변동성이 확대될 전망입니다.", stockMod: -0.16 }
 ];
 
 const player = {
@@ -382,16 +396,19 @@ function restartGame() {
     isGameOver = false;
     gameResult = '';
     floatingTexts = [];
-    newsArchive = ["[턴 1] 모던 벡터 시티 금융 시장 정식 개장. 투자자들의 기대감 고조."];
-    currentNews = { text: "모던 벡터 시티 금융 시장 정식 개장. 투자자들의 기대감 고조.", stockMod: 0 };
+    newsArchive = ["[턴 1] 모던 벡터 시티 증권 시장에 6개 우량 및 성장 섹터가 동시 상장되었습니다."];
+    currentNews = { text: "모던 벡터 시티 증권 시장에 6개 우량 및 성장 섹터가 동시 상장되었습니다.", stockMod: 0 };
     
     stocks.forEach(s => {
         s.owned = 0;
         s.totalCost = 0;
     });
-    stocks[0].price = 50000; stocks[0].prevPrice = 50000;
-    stocks[1].price = 100000; stocks[1].prevPrice = 100000;
-    stocks[2].price = 20000; stocks[2].prevPrice = 20000;
+    stocks[0].price = 45000; stocks[0].prevPrice = 45000;
+    stocks[1].price = 120000; stocks[1].prevPrice = 120000;
+    stocks[2].price = 18000; stocks[2].prevPrice = 18000;
+    stocks[3].price = 32000; stocks[3].prevPrice = 32000;
+    stocks[4].price = 15000; stocks[4].prevPrice = 15000;
+    stocks[5].price = 75000; stocks[5].prevPrice = 75000;
 
     player.x = 120;
     player.y = 320;
@@ -498,7 +515,7 @@ function checkProximity() {
                 dialogue.innerHTML = "🚪 메인 스트리트로 나가는 출구입니다.";
                 actionArea.innerHTML = `<button class="exit-btn" onclick="exitBuilding()">🚪 밖으로 나가기</button>`;
             } else if (zone === 'npc') {
-                dialogue.innerHTML = `💬 <b>${npc.name}</b>: "어서오세요! 원하시는 투자 항목을 선택해 주세요."`;
+                dialogue.innerHTML = `💬 <b>${npc.name}</b>: "어서오세요! 원하는 수량을 입력하거나 버튼으로 간편하게 매매하세요."`;
                 renderDialogueOptions(currentScene);
             } else {
                 dialogue.innerHTML = `🏢 컨설팅 데스크로 가까이 다가가세요.`;
@@ -530,8 +547,8 @@ function renderStockMarketUI() {
     const actionArea = document.getElementById('actionArea');
     let html = `<div style="display: flex; gap: 10px; align-items: flex-start;">`;
     
-    // 왼쪽: 주식 거래 구역
-    html += `<div style="flex: 1.3; max-height: 155px; overflow-y: auto; padding-right: 4px;">`;
+    // 왼쪽: 6개 주식 종목 거래 구역 (스크롤 지원)
+    html += `<div style="flex: 1.4; max-height: 155px; overflow-y: auto; padding-right: 4px;">`;
     stocks.forEach(s => {
         let diff = s.price - s.prevPrice;
         let rate = (diff / s.prevPrice * 100).toFixed(1);
@@ -543,23 +560,24 @@ function renderStockMarketUI() {
 
         html += `
             <div class="stock-card">
-                <div style="text-align:left;">
-                    <span style="font-weight:700; color:#ffffff; font-size:12px;">${s.name}</span>
-                    <span style="font-size:11px; color:${color}; margin-left:4px;">${s.price.toLocaleString()}원 (${sign}${rate}%)</span>
-                    <div style="font-size:10px; color:#cbd5e1; margin-top:1px;">보유: ${s.owned}주 | 평단: ${avgCost.toLocaleString()}원 | 수익률: <span style="color:${returnRate >= 0 ? '#10b981':'#f43f5e'}">${returnRate}%</span> | <span style="color:#38bdf8;">매수가능: ${maxBuyable}주</span></div>
+                <div style="text-align:left; width: 45%;">
+                    <span style="font-weight:700; color:#ffffff; font-size:11px;">${s.name}</span>
+                    <span style="font-size:10px; color:${color}; margin-left:3px;">${s.price.toLocaleString()} (${sign}${rate}%)</span>
+                    <div style="font-size:9px; color:#cbd5e1; margin-top:1px;">보유:${s.owned}주 | 평단:${avgCost.toLocaleString()} | 수익:<span style="color:${returnRate >= 0 ? '#10b981':'#f43f5e'}">${returnRate}%</span></div>
+                    <div style="font-size:9px; color:#38bdf8;">최대매수: ${maxBuyable}주</div>
                 </div>
-                <div>
-                    <button class="action-btn" style="font-size:11px; padding:4px 8px;" onclick="buyStock('${s.id}', 1)">1주매수</button>
-                    <button class="action-btn" style="font-size:11px; padding:4px 8px;" onclick="buyStock('${s.id}', 5)">5주매수</button>
-                    <button class="sell-btn" style="font-size:11px; padding:4px 8px;" onclick="sellStock('${s.id}', 1)">1주매도</button>
-                    <button class="sell-btn" style="font-size:11px; padding:4px 8px;" onclick="sellStock('${s.id}', 5)">전량매도</button>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <input type="number" id="qty_${s.id}" class="stock-input" value="1" min="1" max="99999">
+                    <button class="action-btn" onclick="executeBuy('${s.id}')">매수</button>
+                    <button class="sell-btn" onclick="executeSell('${s.id}')">매도</button>
+                    <button class="action-btn" style="background:#059669;" onclick="executeMaxBuy('${s.id}')">최대</button>
                 </div>
             </div>
         `;
     });
     html += `</div>`;
 
-    // 오른쪽: 실시간 뉴스 게시판 아카이브 구역
+    // 오른쪽: 실시간 뉴스 속보 게시판 아카이브 구역
     html += `<div style="flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 6px 10px; max-height: 155px; overflow-y: auto;">
         <div style="font-size: 12px; font-weight: 700; color: #38bdf8; margin-bottom: 4px; text-align: left;">📰 실시간 뉴스 속보 게시판</div>
     `;
@@ -578,8 +596,12 @@ function renderStockMarketUI() {
     actionArea.innerHTML = html;
 }
 
-function buyStock(stockId, qty) {
+function executeBuy(stockId) {
     if (isGameOver) return;
+    let inputEl = document.getElementById(`qty_${stockId}`);
+    let qty = parseInt(inputEl.value) || 0;
+    if (qty <= 0) { alert("올바른 수량을 입력해주세요!"); return; }
+
     let s = stocks.find(item => item.id === stockId);
     let totalCost = s.price * qty;
     if (cash < totalCost) { alert("현금이 부족합니다!"); return; }
@@ -589,17 +611,34 @@ function buyStock(stockId, qty) {
     s.totalCost += totalCost;
     addFloatingText(-totalCost);
     
-    // 매수 즉시 UI 및 자산 즉각 반영
     updateUI();
     renderStockMarketUI();
 }
 
-function sellStock(stockId, qty) {
+function executeMaxBuy(stockId) {
     if (isGameOver) return;
+    let s = stocks.find(item => item.id === stockId);
+    let maxQty = Math.floor(cash / s.price);
+    if (maxQty <= 0) { alert("매수할 현금이 부족합니다!"); return; }
+
+    let totalCost = s.price * maxQty;
+    cash -= totalCost;
+    s.owned += maxQty;
+    s.totalCost += totalCost;
+    addFloatingText(-totalCost);
+
+    updateUI();
+    renderStockMarketUI();
+}
+
+function executeSell(stockId) {
+    if (isGameOver) return;
+    let inputEl = document.getElementById(`qty_${stockId}`);
+    let qty = parseInt(inputEl.value) || 0;
     let s = stocks.find(item => item.id === stockId);
     if (s.owned <= 0) { alert("보유한 주식이 없습니다!"); return; }
 
-    let sellQty = (qty === 5) ? s.owned : Math.min(qty, s.owned);
+    let sellQty = Math.min(qty, s.owned);
     let revenue = s.price * sellQty;
     
     let avgCost = s.owned > 0 ? (s.totalCost / s.owned) : 0;
@@ -610,7 +649,6 @@ function sellStock(stockId, qty) {
     cash += revenue;
     addFloatingText(revenue);
     
-    // 매도 즉시 UI 및 자산 즉각 반영
     updateUI();
     renderStockMarketUI();
 }
@@ -665,7 +703,7 @@ function processTurn() {
     if (Math.random() < 0.8) {
         currentNews = newsEvents[Math.floor(Math.random() * newsEvents.length)];
     } else {
-        currentNews = { text: "시티 금융 시장이 특별한 이슈 없이 평온한 흐름을 보이고 있습니다.", stockMod: 0 };
+        currentNews = { text: "시티 증권 시장이 특별한 이슈 없이 균형 잡힌 흐름을 보이고 있습니다.", stockMod: 0 };
     }
     
     let newsFormatted = `[턴 ${turn}] ${currentNews.text}`;
