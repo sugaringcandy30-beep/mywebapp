@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="메이플 비치 자산관리 RPG", page_icon="🍁", layout="wide")
 
 st.title("🏙️ 모던 벡터 시티 & 투자 RPG")
-st.caption("방향키(A, D)로 이동, Space키로 점프! 증권타워 주식 매매와 자산 반영 오류가 수정되었습니다.")
+st.caption("방향키(A, D)로 이동, Space키로 점프! 코인은 기존 미니게임으로 원복되었고, 증권타워 주식 매매와 자산 반영이 정상 작동합니다.")
 
 game_html = """
 <!DOCTYPE html>
@@ -253,7 +253,7 @@ game_html = """
 
 <div id="newsTickerBox">
     <span id="newsTag">실시간 속보</span>
-    <span id="newsText">모던 벡터 시티 증권 시장이 개장했습니다. 종목을 매매하고 하룻밤을 보내세요!</span>
+    <span id="newsText">모던 벡터 시티 금융 시장이 개장했습니다. 증권타워에서 주식을 매매하고 하룻밤을 보내세요!</span>
 </div>
 
 <div id="gameContainer">
@@ -514,7 +514,7 @@ function checkProximity() {
                 dialogue.innerHTML = "🚪 메인 스트리트로 나가는 출구입니다.";
                 actionArea.innerHTML = `<button class="exit-btn" onclick="exitBuilding()">🚪 밖으로 나가기</button>`;
             } else if (zone === 'npc') {
-                dialogue.innerHTML = `💬 <b>${npc.name}</b>: "어서오세요! 원하는 투자 항목을 선택해 주세요."`;
+                dialogue.innerHTML = `💬 <b>${npc.name}</b>: "어서오세요! 원하시는 서비스를 선택해 주세요."`;
                 renderDialogueOptions(currentScene);
             } else {
                 dialogue.innerHTML = `🏢 컨설팅 데스크로 가까이 다가가세요.`;
@@ -531,7 +531,8 @@ function renderDialogueOptions(type) {
     } else if (type === 'stock') {
         renderStockMarketUI();
     } else if (type === 'crypto') {
-        actionArea.innerHTML = `<button class="action-btn" style="background: linear-gradient(135deg, #f43f5e, #e11d48);" onclick="investCrypto()">🚀 코인 고위험 고수익 올인 (+100% ~ -50% & 턴 진행)</button> <button class="exit-btn" onclick="exitBuilding()">🚪 나가기</button>`;
+        // 코인랩은 기존의 직접 하는 미니게임/고위험 고수익 올인 방식으로 원복 유지
+        actionArea.innerHTML = `<button class="action-btn" style="background: linear-gradient(135deg, #f43f5e, #e11d48);" onclick="investCrypto()">🚀 코인 고위험 고수익 올인 미니게임 (+100% ~ -50% & 턴 진행)</button> <button class="exit-btn" onclick="exitBuilding()">🚪 나가기</button>`;
     } else if (type === 'realty') {
         actionArea.innerHTML = `
             <button class="action-btn" onclick="buyBuilding('초역세권 오피스텔', 30000000, 2000000)">🏠 오피스텔 (3천만 / 월세 200만)</button>
